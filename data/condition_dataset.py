@@ -44,6 +44,7 @@ class ConditionDataset(BaseDataset):
         Get the next frame path from the given frame path.
         """
         # remove file extension
+        print(frame_path)
         frame_path, file_extension = frame_path.split('.')
         frame_path_list = frame_path.rsplit('_', 1)
         frame_idx = int(frame_path_list[-1])
