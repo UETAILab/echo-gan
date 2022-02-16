@@ -8,7 +8,7 @@ from PIL import Image
 import random
 
 
-class UnalignedDataset(BaseDataset):
+class ConditionDataset(BaseDataset):
     """
     This dataset class can load unaligned/unpaired datasets.
 
