@@ -45,6 +45,7 @@ class ConditionDataset(BaseDataset):
         """
         # remove file extension
         print(frame_path)
+        print(frame_path.split('.'))
         frame_path, file_extension = frame_path.split('.')
         frame_path_list = frame_path.rsplit('_', 1)
         frame_idx = int(frame_path_list[-1])
