@@ -23,7 +23,7 @@ class BaseOptions():
         # parser.add_argument('--dataroot', default="C:/Users/admin/PycharmProjects/video_style_transfer/data", help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
         parser.add_argument('--dataroot', default="../../data/uetgan", help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
         parser.add_argument('--name', type=str, default='experiment_name', help='name of the experiment. It decides where to store samples and models')
-        parser.add_argument('--use_wandb', default=False, help='use wandb')
+        parser.add_argument('--use_wandb', default=True, help='use wandb')
         parser.add_argument('--gpu_ids', type=str, default='3', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
         parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
         # model parameters
