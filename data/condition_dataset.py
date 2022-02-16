@@ -44,9 +44,7 @@ class ConditionDataset(BaseDataset):
         Get the next frame path from the given frame path.
         """
         # remove file extension
-        print(frame_path)
-        print(frame_path.split('.'))
-        frame_path, file_extension = frame_path.split('.')
+        frame_path, file_extension = frame_path.rsplit('.', 1)
         frame_path_list = frame_path.rsplit('_', 1)
         frame_idx = int(frame_path_list[-1])
         next_frame_idx = frame_idx + 1
@@ -96,6 +94,6 @@ class ConditionDataset(BaseDataset):
 
 if __name__ == '__main__':
     opt = torch.load("opt.pth")
-    dataset = UnalignedDataset(opt)
+    dataset = ConditionDataset(opt)
     for i in dataset:
         print(i['A_next'].shape)
