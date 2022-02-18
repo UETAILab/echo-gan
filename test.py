@@ -62,7 +62,7 @@ if __name__ == '__main__':
         visuals = model.get_current_visuals()  # get image results
         img_path = model.get_image_paths()  # get image paths
         frame_data.append([img_path[0], visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy(),
-                           visuals['real_B'].cpu()[0].permute(1, 2, 0).numpy()])
+                           visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy()])
         if i % 5 == 0:
             print('processing (%04d)-th image... %s' % (i, img_path))
     frame_data = sorted(frame_data, key=lambda x: int(get_frame_index(x[0])))
