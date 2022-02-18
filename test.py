@@ -27,6 +27,9 @@ See training and test tips at: https://github.com/junyanz/pytorch-CycleGAN-and-p
 See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
 """
 import os
+
+import IPython
+
 from options.test_options import TestOptions
 from data import create_dataset
 from models import create_model
@@ -37,6 +40,9 @@ try:
     import wandb
 except ImportError:
     print('Warning: wandb package cannot be found. The option "--use_wandb" will result in error.')
+
+def compress_to_gif(folder_path):
+    os.system('convert -delay 10 -loop 0 {}/*.png {}'.format(folder_path, folder_path + '.gif'))
 
 
 if __name__ == '__main__':
@@ -75,5 +81,6 @@ if __name__ == '__main__':
         img_path = model.get_image_paths()     # get image paths
         if i % 5 == 0:  # save images to an HTML file
             print('processing (%04d)-th image... %s' % (i, img_path))
+        IPython.embed()
         save_images(webpage, visuals, img_path, aspect_ratio=opt.aspect_ratio, width=opt.display_winsize, use_wandb=opt.use_wandb)
     webpage.save()  # save the HTML
