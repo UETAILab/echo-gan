@@ -21,7 +21,6 @@ def write_to_gif(gif_path, images, fps=30):
 
 
 def get_frame_index(path):
-    print(path)
     file_name = os.path.basename(path)
     return int(file_name.split('.')[0].rsplit('_', 1)[-1])
 
@@ -67,4 +66,5 @@ if __name__ == '__main__':
         if i % 5 == 0:
             print('processing (%04d)-th image... %s' % (i, img_path))
     frame_data = sorted(frame_data, key=lambda x: int(get_frame_index(x[0])))
-    save_images(webpage, frame_data, opt.results_dir, opt.name, opt.phase)
+    write_to_gif("target.gif", [x[1] for x in frame_data], fps=30)
+    write_to_gif("source.gif", [x[2] for x in frame_data], fps=30)
