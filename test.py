@@ -65,5 +65,5 @@ if __name__ == '__main__':
                            visuals['real_B'].cpu()[0].permute(1, 2, 0).numpy()])
         if i % 5 == 0:
             print('processing (%04d)-th image... %s' % (i, img_path))
-    frame_data = sorted(frame_data, key=lambda x: int(get_frame_index(frame_data[0])))
+    frame_data = sorted(frame_data, key=lambda x: int(get_frame_index(x[0])))
     save_images(webpage, frame_data, opt.results_dir, opt.name, opt.phase)
