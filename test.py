@@ -37,10 +37,6 @@ if __name__ == '__main__':
     model = create_model(opt)  # create a model given opt.model and other options
     model.setup(opt)  # regular setup: load and print networks; create schedulers
 
-    # initialize logger
-    wandb_run = wandb.init(project='CycleGAN-and-pix2pix', name=opt.name, config=opt) if not wandb.run else wandb.run
-    wandb_run._label(repo='CycleGAN-and-pix2pix')
-
     # create a website
     web_dir = os.path.join(opt.results_dir, opt.name,
                            '{}_{}'.format(opt.phase, opt.epoch))  # define the website directory
