@@ -21,6 +21,7 @@ def write_to_gif(gif_path, images, fps=30):
 
 
 def get_frame_index(path):
+    print(path)
     file_name = os.path.basename(path)
     return int(file_name.split('.')[0].rsplit('_', 1)[-1])
 
