@@ -6,6 +6,7 @@ import numpy as np
 from options.test_options import TestOptions
 from data import create_dataset
 from models import create_model
+from util.util import get_frame_index, write_to_gif
 from util.visualizer import save_images
 from util import html
 
@@ -15,15 +16,6 @@ except ImportError:
     print('Warning: wandb package cannot be found. The option "--use_wandb" will result in error.')
 
 
-def write_to_gif(gif_path, images, fps=30):
-    with imageio.get_writer(gif_path, mode='I') as writer:
-        for image in images:
-            writer.append_data(np.hstack(image[0], image[1]))
-
-
-def get_frame_index(path):
-    file_name = os.path.basename(path)
-    return int(file_name.split('.')[0].rsplit('_', 1)[-1])
 
 
 if __name__ == '__main__':
@@ -37,6 +29,8 @@ if __name__ == '__main__':
     dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
     model = create_model(opt)  # create a model given opt.model and other options
     model.setup(opt)  # regular setup: load and print networks; create schedulers
+
+
 
     # create a website
     web_dir = os.path.join(opt.results_dir, opt.name,
@@ -63,4 +57,4 @@ if __name__ == '__main__':
         if i % 5 == 0:
             print('processing (%04d)-th image... %s' % (i, img_path))
     frame_data = sorted(frame_data, key=lambda x: int(get_frame_index(x[0])))
-    write_to_gif("target.gif", [[x[1],x[2]] for x in frame_data], fps=30)
+    write_to_gif("target.gif", [[x[1], x[2]] for x in frame_data], fps=30)

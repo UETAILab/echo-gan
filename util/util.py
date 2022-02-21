@@ -1,9 +1,22 @@
 """This module contains simple helper functions """
 from __future__ import print_function
+
+import imageio
 import torch
 import numpy as np
 from PIL import Image
 import os
+
+
+def write_to_gif(gif_path, images, fps=30):
+    with imageio.get_writer(gif_path, mode='I') as writer:
+        for image in images:
+            writer.append_data(np.hstack([image[0], image[1]]))
+
+
+def get_frame_index(path):
+    file_name = os.path.basename(path)
+    return int(file_name.split('.')[0].rsplit('_', 1)[-1])
 
 
 def tensor2im(input_image, imtype=np.uint8):

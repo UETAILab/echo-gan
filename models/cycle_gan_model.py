@@ -1,6 +1,8 @@
 import torch
+import numpy as np
 import itertools
 from util.image_pool import ImagePool
+from util.util import get_frame_index
 from .base_model import BaseModel
 from . import networks
 
@@ -192,3 +194,5 @@ class CycleGANModel(BaseModel):
         self.backward_D_A()      # calculate gradients for D_A
         self.backward_D_B()      # calculate graidents for D_B
         self.optimizer_D.step()  # update D_A and D_B's weights
+
+

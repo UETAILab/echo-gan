@@ -255,3 +255,10 @@ class Visualizer():
         print(message)  # print the message
         with open(self.log_name, "a") as log_file:
             log_file.write('%s\n' % message)  # save the message
+
+    def display_video_results(self, video_results, epoch, save_result):
+        if video_results.max() <= 1:
+            video_results = np.uint8(video_results*254)
+        self.wandb_run.log({
+            "sequence A to B": wandb.Video(video_results, fps=10, format="gif")
+        })
