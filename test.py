@@ -1,6 +1,7 @@
 import os
 
 import imageio
+import numpy as np
 
 from options.test_options import TestOptions
 from data import create_dataset
@@ -17,7 +18,7 @@ except ImportError:
 def write_to_gif(gif_path, images, fps=30):
     with imageio.get_writer(gif_path, mode='I') as writer:
         for image in images:
-            writer.append_data(image)
+            writer.append_data(np.hstack(image[0], image[1]))
 
 
 def get_frame_index(path):
@@ -62,5 +63,4 @@ if __name__ == '__main__':
         if i % 5 == 0:
             print('processing (%04d)-th image... %s' % (i, img_path))
     frame_data = sorted(frame_data, key=lambda x: int(get_frame_index(x[0])))
-    write_to_gif("target.gif", [x[1] for x in frame_data], fps=30)
-    write_to_gif("source.gif", [x[2] for x in frame_data], fps=30)
+    write_to_gif("target.gif", [[x[1],x[2]] for x in frame_data], fps=30)
