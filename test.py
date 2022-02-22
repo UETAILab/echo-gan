@@ -27,37 +27,29 @@ if __name__ == '__main__':
     opt.no_flip = True  # no flip; comment this line if results on flipped images are needed.
     opt.display_id = -1  # no visdom display; the test code saves the results to a HTML file.
     dataset = create_dataset(opt)  # create a dataset given opt.dataset_mode and other options
-    for i in dataset:
-        print(i["A_paths"])
-    # model = create_model(opt)  # create a model given opt.model and other options
-    # model.setup(opt)  # regular setup: load and print networks; create schedulers
-    #
-    #
-    #
-    # if opt.eval:
-    #     model.eval()
-    # frame_data = []
-    # for i, data in enumerate(dataset):
-    #     if i >= opt.num_test:  # only apply our model to opt.num_test images.
-    #         break
-    #     model.set_input(data)  # unpack data from data loader
-    #     model.test()  # run inference
-    #     visuals = model.get_current_visuals()  # get image results
-    #     img_path = model.get_image_paths()  # get image paths
-    #     frame_data.append([img_path[0], visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy(),
-    #                        visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy()])
-    #     if i % 5 == 0:
-    #         print('processing (%04d)-th image... %s' % (i, img_path))
+    model = create_model(opt)  # create a model given opt.model and other options
+    model.setup(opt)  # regular setup: load and print networks; create schedulers
 
-    # frame_data = sorted(frame_data, key=lambda x: int(get_frame_index(x[0])))
-    # frame_data = [np.hstack([x[1], x[2]]) for x in frame_data]
-    # frame_data = np.array(frame_data)
-    # frame_data = frame_data.transpose(0, 3, 1, 2)
-    # torch.save(frame_data, "frame.pth")
-    frame_data = torch.load("frame.pth")
-    # scale frames to 0-1
-    frame_data = (frame_data - frame_data.min()) / (frame_data.max() - frame_data.min())
-    frame_data = np.uint8(frame_data * 255)
+    frame_data = []
+    for i, data in enumerate(dataset):
+        model.set_input(data)  # unpack data from data loader
+        model.test()  # run inference
+        if i > 100:
+            break
+        visuals = model.get_current_visuals()  # get image results
+        img_path = model.get_image_paths()  # get image paths
+        frame_data.append([img_path[0],
+                           np.hstack([visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy(),
+                                      visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy()])
+                           ])
+
+    frame_data = np.array([x[1] for x in frame_data])
+    # convert to channels first to fit wandb logger
+    frame_data = frame_data.transpose(0, 3, 1, 2)
+    video_results = frame_data
+    video_results = (video_results - video_results.min()) / (video_results.max() - video_results.min())
+    video_results = np.uint8(video_results * 255)
+
     wandb_run.log({
-        "sequence A to B": wandb.Video(frame_data, fps=10, format="gif")
+        "sequence A to B": wandb.Video(video_results, fps=10, format="gif")
     })
