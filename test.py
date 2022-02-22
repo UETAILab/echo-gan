@@ -36,8 +36,8 @@ if __name__ == '__main__':
         visuals = model.get_current_visuals()  # get image results
         img_path = model.get_image_paths()  # get image paths
         frame_data.append([img_path[0],
-                           np.hstack([visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy(),
-                                      visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy()])
+                           np.hstack([visuals['fake_B'].cpu()[0].permute(1, 2, 0).detach().numpy(),
+                                      visuals['real_A'].cpu()[0].permute(1, 2, 0).detach().numpy()])
                            ])
         break
     for k in visuals.keys():
