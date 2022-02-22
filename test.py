@@ -28,7 +28,8 @@ if __name__ == '__main__':
     frame_data = []
     for i, data in enumerate(dataset):
         model.set_input(data)  # unpack data from data loader
-        model.compute_visuals()  # run inference
+        model.forward()  # run inference
+
         if i > 100:
             break
         visuals = model.get_current_visuals()  # get image results
