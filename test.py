@@ -1,15 +1,8 @@
-import os
-
-import imageio
 import numpy as np
-import torch
 
-from options.test_options import TestOptions
 from data import create_dataset
 from models import create_model
-from util.util import get_frame_index, write_to_gif
-from util.visualizer import save_images
-from util import html
+from options.test_options import TestOptions
 
 try:
     import wandb
