@@ -20,6 +20,8 @@ See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-a
 """
 import copy
 import time
+
+from options.test_options import TestOptions
 from options.train_options import TrainOptions
 from data import create_dataset
 from models import create_model
@@ -37,11 +39,16 @@ if __name__ == '__main__':
     visualizer = Visualizer(opt)   # create a visualizer that display/save images and plots
     total_iters = 0                # the total number of training iterations
 
-    test_opt = copy.deepcopy(opt)
-    test_opt.dataset_mode = "test"
-    test_opt.batch_size = 1
-    test_opt.load_size = test_opt.crop_size
-    test_dataset = create_dataset(opt)
+    test_opt = TestOptions().parse()
+    test_opt.gpu_ids = opt.gpu_ids
+    test_opt.num_threads = 0  # test code only supports num_threads = 0
+    test_opt.batch_size = 1  # test code only supports batch_size = 1
+    test_opt.serial_batches = True  # disable data shuffling; comment this line if results on randomly chosen images are needed.
+    test_opt.no_flip = True  # no flip; comment this line if results on flipped images are needed.
+    test_opt.display_id = -1  # no visdom display; the test code saves the results to a HTML file.
+    test_opt.dataroot = opt.dataroot
+    test_opt.dataset_mode = opt.dataset_mode
+    test_dataset = create_dataset(test_opt)
 
     for epoch in range(opt.epoch_count, opt.n_epochs + opt.n_epochs_decay + 1):    # outer loop for different epochs; we save the model by <epoch_count>, <epoch_count>+<save_latest_freq>
         epoch_start_time = time.time()  # timer for entire epoch

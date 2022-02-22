@@ -48,9 +48,9 @@ class ConditionDataset(BaseDataset):
         frame_path_list = frame_path.rsplit('_', 1)
         frame_idx = int(frame_path_list[-1])
         next_frame_idx = frame_idx + 1
-        next_frame_path = '_'.join(frame_path_list[:-1]) + '_' + str(next_frame_idx) + '.' + file_extension
+        next_frame_path = '_'.join(frame_path_list[:-1]) + '_' + "{:04d}".format(next_frame_idx) + '.' + file_extension
         if not os.path.exists(next_frame_path):
-            next_frame_path = '_'.join(frame_path_list[:-1]) + '_' + str(next_frame_idx - 2) + '.' + file_extension
+            next_frame_path = '_'.join(frame_path_list[:-1]) + '_' + "{:04d}".format(next_frame_idx - 2) + '.' + file_extension
 
         assert os.path.exists(next_frame_path), 'The next frame path {} does not exist'.format(next_frame_path)
         return next_frame_path

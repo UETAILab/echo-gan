@@ -257,8 +257,8 @@ class Visualizer():
             log_file.write('%s\n' % message)  # save the message
 
     def display_video_results(self, video_results, epoch, save_result):
-        if video_results.max() <= 1:
-            video_results = np.uint8(video_results*254)
+        video_results = (video_results - video_results.min()) / (video_results.max() - video_results.min())
+        video_results = np.uint8(video_results * 255)
         self.wandb_run.log({
-            "sequence A to B": wandb.Video(video_results, fps=10, format="gif")
+            "sequence A to B": wandb.Video(video_results, fps=12, format="gif")
         })

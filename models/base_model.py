@@ -237,8 +237,6 @@ class BaseModel(ABC):
         print("query test video ...")
         frame_data = []
         for i, data in enumerate(dataset):
-            if i >= num_test:  # only apply our model to opt.num_test images.
-                break
             self.set_input(data)  # unpack data from data loader
             self.test()  # run inference
             visuals = self.get_current_visuals()  # get image results
@@ -247,7 +245,7 @@ class BaseModel(ABC):
                                np.hstack([visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy(),
                                           visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy()])
                                ])
-        frame_data = sorted(frame_data, key=lambda x: int(get_frame_index(x[0])))
+
         frame_data = np.array([x[1] for x in frame_data])
         # convert to channels first to fit wandb logger
         frame_data = frame_data.transpose(0, 3, 1, 2)
