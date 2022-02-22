@@ -245,7 +245,8 @@ class BaseModel(ABC):
             img_path = self.get_image_paths()  # get image paths
             frame_data.append([img_path[0],
                                np.hstack([visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy(),
-                                          visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy()])
+                                          visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy(),
+                                          visuals['real_B'].cpu()[0].permute(1, 2, 0).numpy()])
                                ])
 
         frame_data = np.array([x[1] for x in frame_data])

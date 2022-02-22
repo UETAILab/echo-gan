@@ -7,6 +7,15 @@ import numpy as np
 from PIL import Image
 import os
 
+def random_seed_all(random_seed):
+    import random
+    import numpy as np
+    import torch
+    random.seed(random_seed)
+    np.random.seed(random_seed)
+    torch.manual_seed(random_seed)
+    torch.cuda.manual_seed(random_seed)
+    torch.cuda.manual_seed_all(random_seed)
 
 def write_to_gif(gif_path, images, fps=30):
     with imageio.get_writer(gif_path, mode='I') as writer:
