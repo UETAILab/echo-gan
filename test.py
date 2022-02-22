@@ -41,7 +41,7 @@ if __name__ == '__main__':
                            ])
         break
     for k in visuals.keys():
-        imageio.mimsave(f'{k}.png', visuals[k].cpu()[0].permute(1, 2, 0).numpy())
+        imageio.imsave(f'{k}.png', visuals[k].cpu()[0].permute(1, 2, 0).numpy())
     IPython.embed()
 
     frame_data = np.array([x[1] for x in frame_data])
