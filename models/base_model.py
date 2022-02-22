@@ -239,6 +239,8 @@ class BaseModel(ABC):
         for i, data in enumerate(dataset):
             self.set_input(data)  # unpack data from data loader
             self.test()  # run inference
+            if i > num_test:
+                break
             visuals = self.get_current_visuals()  # get image results
             img_path = self.get_image_paths()  # get image paths
             frame_data.append([img_path[0],
