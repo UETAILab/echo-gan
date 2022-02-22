@@ -1,3 +1,4 @@
+import IPython
 import numpy as np
 
 from data import create_dataset
@@ -35,7 +36,8 @@ if __name__ == '__main__':
                            np.hstack([visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy(),
                                       visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy()])
                            ])
-
+        break
+    IPython.embed()
     frame_data = np.array([x[1] for x in frame_data])
     # convert to channels first to fit wandb logger
     frame_data = frame_data.transpose(0, 3, 1, 2)
