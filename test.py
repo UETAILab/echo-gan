@@ -1,4 +1,5 @@
 import IPython
+import imageio
 import numpy as np
 
 from data import create_dataset
@@ -27,7 +28,7 @@ if __name__ == '__main__':
     frame_data = []
     for i, data in enumerate(dataset):
         model.set_input(data)  # unpack data from data loader
-        model.test()  # run inference
+        model.compute_visuals()  # run inference
         if i > 100:
             break
         visuals = model.get_current_visuals()  # get image results
@@ -37,7 +38,10 @@ if __name__ == '__main__':
                                       visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy()])
                            ])
         break
+    for k in visuals.keys():
+        imageio.mimsave(f'{k}.png', visuals[k].cpu()[0].permute(1, 2, 0).numpy())
     IPython.embed()
+
     frame_data = np.array([x[1] for x in frame_data])
     # convert to channels first to fit wandb logger
     frame_data = frame_data.transpose(0, 3, 1, 2)
