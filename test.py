@@ -28,6 +28,7 @@ if __name__ == '__main__':
     frame_data = []
     for i, data in enumerate(dataset):
         model.set_input(data)  # unpack data from data loader
+        model.test()  # run inference
         model.forward()  # run inference
 
         if i > 100:
