@@ -52,7 +52,7 @@ class MUNITModel(BaseModel):
         """
         BaseModel.__init__(self, opt)
         # specify the training losses you want to print out. The training/test scripts will call <BaseModel.get_current_losses>
-        self.loss_names = [i for i in dir(self) if i.startswith("loss")]
+        self.loss_names = [i[4:] for i in dir(self) if i.startswith("loss")]
         # specify the images you want to save/display. The training/test scripts will call <BaseModel.get_current_visuals>
         visual_names_A = ['real_A', 'fake_B']
         visual_names_B = ['real_B', 'fake_A']
