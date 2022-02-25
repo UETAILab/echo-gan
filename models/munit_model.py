@@ -18,6 +18,7 @@ class MUNITModel(BaseModel):
 
     MUNIT paper: https://arxiv.org/pdf/1804.04732.pdf
     """
+
     @staticmethod
     def modify_commandline_options(parser, is_train=True):
         """Add new dataset-specific options, and rewrite default values for existing options.
@@ -52,11 +53,12 @@ class MUNITModel(BaseModel):
         """
         BaseModel.__init__(self, opt)
         # specify the training losses you want to print out. The training/test scripts will call <BaseModel.get_current_losses>
-        self.loss_names = [i[4:] for i in dir(self) if i.startswith("loss")]
+        self.loss_names = ["gen_recon_x_a", "gen_recon_x_b", "gen_recon_s_a", "gen_recon_s_b", "gen_recon_c_a",
+                           "gen_recon_c_b", "gen_cycrecon_x_a", "gen_cycrecon_x_b", "gen_adv_a", "gen_adv_b",
+                           "gen_total", "dis_a", "dis_b", "dis_total"]
         # specify the images you want to save/display. The training/test scripts will call <BaseModel.get_current_visuals>
         visual_names_A = ['real_A', 'fake_B']
         visual_names_B = ['real_B', 'fake_A']
-
 
         self.visual_names = visual_names_A + visual_names_B  # combine visualizations for A and B
         # specify the models you want to save to the disk. The training/test scripts will call <BaseModel.save_networks> and <BaseModel.load_networks>.
@@ -119,7 +121,6 @@ class MUNITModel(BaseModel):
                                             lr=opt.lr, betas=(beta1, beta2))
             self.optimizers = [self.gen_opt, self.dis_opt]
 
-
     def set_input(self, input):
         """Unpack input data from the dataloader and perform necessary pre-processing steps.
 
@@ -154,8 +155,10 @@ class MUNITModel(BaseModel):
         self.content_b_recon, self.style_a_random_recon = self.netG_A.encode(self.fake_A)
         self.content_a_recon, self.style_b_random_recon = self.netG_B.encode(self.fake_B)
         # decode again (if needed)
-        self.x_aba = self.netG_A.decode(self.content_a_recon, self.style_real_A) if self.configs['recon_x_cyc_w'] > 0 else None
-        self.x_bab = self.netG_B.decode(self.content_b_recon, self.style_real_B) if self.configs['recon_x_cyc_w'] > 0 else None
+        self.x_aba = self.netG_A.decode(self.content_a_recon, self.style_real_A) if self.configs[
+                                                                                        'recon_x_cyc_w'] > 0 else None
+        self.x_bab = self.netG_B.decode(self.content_b_recon, self.style_real_B) if self.configs[
+                                                                                        'recon_x_cyc_w'] > 0 else None
 
         # discriminator forward
 
@@ -176,8 +179,10 @@ class MUNITModel(BaseModel):
         self.loss_gen_recon_s_b = self.recon_criterion(self.style_b_random_recon, self.style_b_random)
         self.loss_gen_recon_c_a = self.recon_criterion(self.content_a_recon, self.content_a)
         self.loss_gen_recon_c_b = self.recon_criterion(self.content_b_recon, self.content_b)
-        self.loss_gen_cycrecon_x_a = self.recon_criterion(self.x_aba, self.real_A) if self.configs['recon_x_cyc_w'] > 0 else 0
-        self.loss_gen_cycrecon_x_b = self.recon_criterion(self.x_bab, self.real_B) if self.configs['recon_x_cyc_w'] > 0 else 0
+        self.loss_gen_cycrecon_x_a = self.recon_criterion(self.x_aba, self.real_A) if self.configs[
+                                                                                          'recon_x_cyc_w'] > 0 else 0
+        self.loss_gen_cycrecon_x_b = self.recon_criterion(self.x_bab, self.real_B) if self.configs[
+                                                                                          'recon_x_cyc_w'] > 0 else 0
         # GAN loss
         self.loss_gen_adv_a = self.netD_A.calc_gen_loss(self.fake_A)
         self.loss_gen_adv_b = self.netD_B.calc_gen_loss(self.fake_B)
@@ -195,8 +200,8 @@ class MUNITModel(BaseModel):
                               self.configs['recon_c_w'] * self.loss_gen_recon_c_b + \
                               self.configs['recon_x_cyc_w'] * self.loss_gen_cycrecon_x_a + \
                               self.configs['recon_x_cyc_w'] * self.loss_gen_cycrecon_x_b
-                              # self.configs['vgg_w'] * self.loss_gen_vgg_a + \
-                              # self.configs['vgg_w'] * self.loss_gen_vgg_b
+        # self.configs['vgg_w'] * self.loss_gen_vgg_a + \
+        # self.configs['vgg_w'] * self.loss_gen_vgg_b
         self.loss_gen_total.backward()
 
     def backward_D(self):
@@ -211,8 +216,8 @@ class MUNITModel(BaseModel):
     def optimize_parameters(self):
         """Calculate losses, gradients, and update network weights; called in every training iteration"""
         # forward
-        self.forward()      # compute fake images and reconstruction images.
-        self.backward_G()   # calculate gradients for G
-        self.backward_D()   # calculate gradients for D
+        self.forward()  # compute fake images and reconstruction images.
+        self.backward_G()  # calculate gradients for G
+        self.backward_D()  # calculate gradients for D
         self.gen_opt.step()
         self.dis_opt.step()
