@@ -73,12 +73,11 @@ class MUNITModel(BaseModel):
         self.configs = yaml.load(open(opt.munit_config_path, 'r'))
         if len(self.gpu_ids) > 1:
             raise NotImplementedError("Multi-GPU is not supported yet.")
-        self.gpu_ids = self.gpu_ids[0]
-        self.netG_A = AdaINGen(opt.input_nc, self.configs['gen']).to(self.gpu_ids)  # auto-encoder for domain a
-        self.netG_B = AdaINGen(opt.input_nc, self.configs['gen']).to(self.gpu_ids)  # auto-encoder for domain b
-        self.netD_A = MsImageDis(opt.input_nc, self.configs['dis']).to(self.gpu_ids)  # discriminator for domain a
-        self.netD_B = MsImageDis(opt.input_nc, self.configs['dis']).to(self.gpu_ids)  # discriminator for domain b
-        self.instancenorm = nn.InstanceNorm2d(512, affine=False).to(self.gpu_ids)
+        self.netG_A = AdaINGen(opt.input_nc, self.configs['gen']).to(self.gpu_ids[0])  # auto-encoder for domain a
+        self.netG_B = AdaINGen(opt.input_nc, self.configs['gen']).to(self.gpu_ids[0])  # auto-encoder for domain b
+        self.netD_A = MsImageDis(opt.input_nc, self.configs['dis']).to(self.gpu_ids[0])  # discriminator for domain a
+        self.netD_B = MsImageDis(opt.input_nc, self.configs['dis']).to(self.gpu_ids[0])  # discriminator for domain b
+        self.instancenorm = nn.InstanceNorm2d(512, affine=False).to(self.gpu_ids[0])
         self.style_dim = self.configs['gen']['style_dim']
 
         # fix the noise used in sampling
