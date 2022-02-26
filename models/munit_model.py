@@ -57,8 +57,8 @@ class MUNITModel(BaseModel):
                            "gen_recon_c_b", "gen_cycrecon_x_a", "gen_cycrecon_x_b", "gen_adv_a", "gen_adv_b",
                            "gen_total", "dis_a", "dis_b", "dis_total"]
         # specify the images you want to save/display. The training/test scripts will call <BaseModel.get_current_visuals>
-        visual_names_A = ['real_A', 'fake_B']
-        visual_names_B = ['real_B', 'fake_A']
+        visual_names_A = ['real_A', 'fake_B', "real_A_recon"]
+        visual_names_B = ['real_B', 'fake_A', "real_B_recon"]
 
         self.visual_names = visual_names_A + visual_names_B  # combine visualizations for A and B
         # specify the models you want to save to the disk. The training/test scripts will call <BaseModel.save_networks> and <BaseModel.load_networks>.
