@@ -138,6 +138,7 @@ class MUNITModel(BaseModel):
 
     def forward(self):
         """Run forward pass; called by both functions <optimize_parameters> and <test>."""
+        # if self.isTrain:
         # generater forward
         self.style_a_random = Variable(torch.randn(self.real_A.size(0), self.style_dim, 1, 1).cuda())
         self.style_b_random = Variable(torch.randn(self.real_B.size(0), self.style_dim, 1, 1).cuda())
@@ -169,6 +170,18 @@ class MUNITModel(BaseModel):
         # decode (cross domain)
         self.x_ba = self.netG_A.decode(self.c_b, self.s_a)
         self.x_ab = self.netG_B.decode(self.c_a, self.s_b)
+        # else:
+        #     self.style_a_random = Variable(torch.randn(self.real_A.size(0), self.style_dim, 1, 1).cuda())
+        #     self.style_b_random = Variable(torch.randn(self.real_B.size(0), self.style_dim, 1, 1).cuda())
+        #     # encode
+        #     self.content_a, self.style_real_A = self.netG_A.encode(self.real_A)
+        #     self.content_b, self.style_real_B = self.netG_B.encode(self.real_B)
+        #     # decode (within domain)
+        #     self.real_A_recon = self.netG_A.decode(self.content_a, self.style_real_A)
+        #     self.real_B_recon = self.netG_B.decode(self.content_b, self.style_real_B)
+        #     # decode (cross domain)
+        #     self.fake_A = self.netG_A.decode(self.content_b, self.style_a_random)
+        #     self.fake_B = self.netG_B.decode(self.content_a, self.style_b_random)
 
     def backward_G(self):
         self.gen_opt.zero_grad()
@@ -210,7 +223,6 @@ class MUNITModel(BaseModel):
         self.loss_dis_b = self.netD_B.calc_dis_loss(self.x_ab.detach(), self.real_B)
         self.loss_dis_total = self.configs['gan_w'] * self.loss_dis_a + self.configs['gan_w'] * self.loss_dis_b
         self.loss_dis_total.backward()
-        self.dis_opt.step()
 
     def optimize_parameters(self):
         """Calculate losses, gradients, and update network weights; called in every training iteration"""
