@@ -154,7 +154,7 @@ class UNITModel(BaseModel):
         self.x_bab = self.netG_B.decode(self.h_b_recon + self.n_b_recon) if self.configs['recon_x_cyc_w'] > 0 else None
 
     def backward_G(self):
-        self.dis_opt.zero_grad()
+        self.gen_opt.zero_grad()
         self.loss_gen_recon_x_a = self.recon_criterion(self.real_A_recon, self.real_A)
         self.loss_gen_recon_x_b = self.recon_criterion(self.real_B_recon, self.real_B)
         self.loss_gen_recon_kl_a = self.__compute_kl(self.h_a)
