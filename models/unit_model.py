@@ -184,15 +184,9 @@ class UNITModel(BaseModel):
 
     def backward_D(self):
         self.dis_opt.zero_grad()
-        # encode
-        h_a, n_a = self.netG_A.encode(self.real_A)
-        h_b, n_b = self.netG_B.encode(self.real_B)
-        # decode (cross domain)
-        x_ba = self.netG_A.decode(h_b + n_b)
-        x_ab = self.netG_B.decode(h_a + n_a)
         # D loss
-        self.loss_dis_a = self.netD_A.calc_dis_loss(x_ba.detach(), self.real_A)
-        self.loss_dis_b = self.netD_B.calc_dis_loss(x_ab.detach(), self.real_B)
+        self.loss_dis_a = self.netD_A.calc_dis_loss(self.fake_A.detach(), self.real_A)
+        self.loss_dis_b = self.netD_B.calc_dis_loss(self.fake_B.detach(), self.real_B)
         self.loss_dis_total = self.configs['gan_w'] * self.loss_dis_a + self.configs['gan_w'] * self.loss_dis_b
         self.loss_dis_total.backward()
 
