@@ -1,6 +1,11 @@
 import os
 
+import cv2
 import torch
+from matplotlib import pyplot as plt
+from torch.nn.functional import one_hot
+from torchvision import transforms
+import numpy as np
 
 from data.base_dataset import BaseDataset, get_transform
 from data.image_folder import make_dataset
@@ -8,7 +13,7 @@ from PIL import Image
 import random
 
 
-class ConditionDataset(BaseDataset):
+class MultiChannelDataset(BaseDataset):
     """
     This dataset class can load unaligned/unpaired datasets.
 
@@ -55,6 +60,15 @@ class ConditionDataset(BaseDataset):
         assert os.path.exists(next_frame_path), 'The next frame path {} does not exist'.format(next_frame_path)
         return next_frame_path
 
+    def convert_channel(self, frame):
+        frame = np.array(frame)
+        frame = cv2.resize(frame, (256, 256), interpolation=cv2.INTER_NEAREST)
+        frame = torch.Tensor(frame)
+        frame = torch.Tensor(frame)
+        frame = one_hot(frame.to(torch.long))
+        frame = frame.permute(2, 0, 1).to(torch.float32)
+        return frame
+
     def __getitem__(self, index):
         """Return a data point and its metadata information.
 
@@ -73,12 +87,13 @@ class ConditionDataset(BaseDataset):
         else:  # randomize the index for domain B to avoid fixed pairs.
             index_B = random.randint(0, self.B_size - 1)
         B_path = self.B_paths[index_B]
-        A_img = Image.open(A_path).convert('RGB')
-        A_next = Image.open(self._get_next_frame_path(A_path)).convert('RGB')
+        A_img = Image.open(A_path)
+        A_next = Image.open(self._get_next_frame_path(A_path))
+
+        A = self.convert_channel(A_img)
+        A_next = self.convert_channel(A_next)
+
         B_img = Image.open(B_path).convert('RGB')
-        # apply image transformation
-        A = self.transform_A(A_img)
-        A_next = self.transform_A(A_next)
         B = self.transform_B(B_img)
 
         return {'A': A, 'A_next': A_next, 'B': B, 'A_paths': A_path, 'B_paths': B_path}
@@ -94,6 +109,11 @@ class ConditionDataset(BaseDataset):
 
 if __name__ == '__main__':
     opt = torch.load("../opt.pth")
-    dataset = ConditionDataset(opt)
+    dataset = MultiChannelDataset(opt)
     for i in dataset:
-        print(i['A_next'].shape)
+        image = i['A_next']
+        # visualize matplotlib
+        for j in range(image.shape[-1]):
+            cv2.imshow("image", np.uint8(image[:, :, j].numpy()*255.0))
+            cv2.waitKey(0)
+        break
