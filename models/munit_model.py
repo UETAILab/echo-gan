@@ -4,7 +4,7 @@ from torch import nn
 from torch.autograd import Variable
 
 from .base_model import BaseModel
-from .networks import AdaINGen, MsImageDis
+from .networks import AdaINGen, MsImageDis, init_weights
 
 
 class MUNITModel(BaseModel):
@@ -79,6 +79,11 @@ class MUNITModel(BaseModel):
         self.netD_B = MsImageDis(opt.input_nc, self.configs['dis']).to(self.gpu_ids[0])  # discriminator for domain b
         self.instancenorm = nn.InstanceNorm2d(512, affine=False).to(self.gpu_ids[0])
         self.style_dim = self.configs['gen']['style_dim']
+
+        init_weights(self.netG_A)
+        init_weights(self.netG_B)
+        init_weights(self.netD_A)
+        init_weights(self.netD_B)
 
         # fix the noise used in sampling
         display_size = int(self.configs['display_size'])
