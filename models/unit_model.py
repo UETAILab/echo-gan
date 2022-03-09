@@ -3,7 +3,7 @@ import yaml
 from torch import nn
 
 from .base_model import BaseModel
-from .networks import MsImageDis, VAEGen
+from .networks import MsImageDis, VAEGen, init_weights
 
 
 class UNITModel(BaseModel):
@@ -81,8 +81,10 @@ class UNITModel(BaseModel):
         self.instancenorm = nn.InstanceNorm2d(512, affine=False).to(self.gpu_ids[0])
         self.style_dim = self.configs['gen']['style_dim']
 
-        # fix the noise used in sampling
-        display_size = int(self.configs['display_size'])
+        init_weights(self.netG_A)
+        init_weights(self.netG_B)
+        init_weights(self.netD_A)
+        init_weights(self.netD_B)
 
         # Setup the optimizers
         # TODO
