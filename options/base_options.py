@@ -33,12 +33,36 @@ class BaseOptions():
         parser.add_argument('--ngf', type=int, default=64, help='# of gen filters in the last conv layer')
         parser.add_argument('--ndf', type=int, default=64, help='# of discrim filters in the first conv layer')
         parser.add_argument('--netD', type=str, default='basic', help='specify discriminator architecture [basic | n_layers | pixel]. The basic model is a 70x70 PatchGAN. n_layers allows you to specify the layers in the discriminator')
-        parser.add_argument('--netG', type=str, default='resnet_9blocks', help='specify generator architecture [resnet_9blocks | resnet_6blocks | unet_256 | unet_128]')
+        parser.add_argument('--netG', type=str, default='global', help='specify generator architecture [resnet_9blocks | resnet_6blocks | unet_256 | unet_128]')
         parser.add_argument('--n_layers_D', type=int, default=3, help='only used if netD==n_layers')
         parser.add_argument('--norm', type=str, default='instance', help='instance normalization or batch normalization [instance | batch | none]')
         parser.add_argument('--init_type', type=str, default='normal', help='network initialization [normal | xavier | kaiming | orthogonal]')
         parser.add_argument('--init_gain', type=float, default=0.02, help='scaling factor for normal, xavier and orthogonal.')
         parser.add_argument('--no_dropout', action='store_true', help='no dropout for the generator')
+        parser.add_argument('--n_downsample_global', type=int, default=4,
+                                 help='number of downsampling layers in netG')
+        parser.add_argument('--n_blocks_global', type=int, default=9,
+                                 help='number of residual blocks in the global generator network')
+        parser.add_argument('--n_blocks_local', type=int, default=3,
+                                 help='number of residual blocks in the local enhancer network')
+        parser.add_argument('--n_local_enhancers', type=int, default=1, help='number of local enhancers to use')
+        parser.add_argument('--niter_fix_global', type=int, default=0,
+                                 help='number of epochs that we only train the outmost local enhancer')
+        parser.add_argument('--num_D', type=int, default=2, help='number of discriminators to use')
+        # for instance-wise features
+        parser.add_argument('--no_instance', action='store_true',
+                                 help='if specified, do *not* add instance map as input')
+        parser.add_argument('--instance_feat', action='store_true',
+                                 help='if specified, add encoded instance features as input')
+        parser.add_argument('--label_feat', action='store_true',
+                                 help='if specified, add encoded label features as input')
+        parser.add_argument('--feat_num', type=int, default=3, help='vector length for encoded features')
+        parser.add_argument('--load_features', action='store_true',
+                                 help='if specified, load precomputed feature maps')
+        parser.add_argument('--n_downsample_E', type=int, default=4, help='# of downsampling layers in encoder')
+        parser.add_argument('--nef', type=int, default=16, help='# of encoder filters in the first conv layer')
+        parser.add_argument('--n_clusters', type=int, default=10, help='number of clusters for features')
+
         # dataset parameters
         parser.add_argument('--dataset_mode', type=str, default='condition', help='chooses how datasets are loaded. [multichannel | video | unaligned | condition | aligned | single | colorization]')
         parser.add_argument('--direction', type=str, default='AtoB', help='AtoB or BtoA')
