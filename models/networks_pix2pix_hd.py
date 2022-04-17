@@ -8,6 +8,9 @@ import numpy as np
 ###############################################################################
 # Functions
 ###############################################################################
+from models.networks import SpectralNorm
+
+
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
@@ -47,13 +50,15 @@ def define_G(input_nc, output_nc, ngf, netG, n_downsample_global=3, n_blocks_glo
 
 
 def define_D(input_nc, ndf, n_layers_D, norm='instance', use_sigmoid=False, num_D=1, getIntermFeat=False, gpu_ids=[]):
-    norm_layer = get_norm_layer(norm_type=norm)
-    netD = MultiscaleDiscriminator(input_nc, ndf, n_layers_D, norm_layer, use_sigmoid, num_D, getIntermFeat)
+    # norm_layer = get_norm_layer(norm_type=norm)
+    # netD = MultiscaleDiscriminator(input_nc, ndf, n_layers_D, norm_layer, use_sigmoid, num_D, getIntermFeat)
+    netD = NLayerDiscriminatorSN(input_nc, ndf, n_layers_D, use_sigmoid=use_sigmoid)
     if len(gpu_ids) > 0:
         assert (torch.cuda.is_available())
         netD.cuda(gpu_ids[0])
     netD.apply(weights_init)
     return netD
+
 
 
 def print_network(net):
@@ -64,6 +69,47 @@ def print_network(net):
         num_params += param.numel()
     print('Total number of parameters: %d' % num_params)
 
+
+class NLayerDiscriminatorSN(nn.Module):
+    def __init__(self, input_nc, ndf=64, n_layers=3, use_sigmoid=False):
+        super(NLayerDiscriminatorSN, self).__init__()
+        use_bias = False
+
+        kw = 4
+        padw = 1
+        sequence = [
+            SpectralNorm(nn.Conv2d(input_nc, ndf, kernel_size=kw, stride=2, padding=padw)),
+            nn.LeakyReLU(0.2, True)
+        ]
+
+        nf_mult = 1
+        nf_mult_prev = 1
+        for n in range(1, n_layers):
+            nf_mult_prev = nf_mult
+            nf_mult = min(2**n, 8)
+            sequence += [
+                SpectralNorm(nn.Conv2d(ndf * nf_mult_prev, ndf * nf_mult,
+                          kernel_size=kw, stride=2, padding=padw, bias=use_bias)),
+                nn.LeakyReLU(0.2, True)
+            ]
+
+        nf_mult_prev = nf_mult
+        nf_mult = min(2**n_layers, 8)
+        sequence += [
+            SpectralNorm(nn.Conv2d(ndf * nf_mult_prev, ndf * nf_mult,
+                      kernel_size=kw, stride=1, padding=padw, bias=use_bias)),
+            nn.LeakyReLU(0.2, True)
+        ]
+
+        sequence += [SpectralNorm(nn.Conv2d(ndf * nf_mult, 1, kernel_size=kw, stride=1, padding=padw))]
+
+        if use_sigmoid:
+            sequence += [nn.Sigmoid()]
+
+        self.model = nn.Sequential(*sequence)
+
+    def forward(self, input):
+        return self.model(input)
 
 ##############################################################################
 # Losses
