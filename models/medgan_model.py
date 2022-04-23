@@ -65,7 +65,7 @@ class MedGANModel(BaseModel):
             self.model_names = ['G']
         # define networks (both generator and discriminator)
         self.netG = utils.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.norm_G,
-                                      not opt.no_dropout, opt.n_layers_D, opt.init_type, opt.init_gain, self.gpu_ids, opt) # n_block default is set equal 6
+                                      not opt.no_dropout, opt.n_casnet_block, opt.init_type, opt.init_gain, self.gpu_ids, opt) # n_block default is set equal 6
 
         if self.isTrain:  # define a discriminator; conditional GANs need to take both input and output images; Therefore, #channels for D is input_nc + output_nc
             self.netD = utils.define_D(opt.input_nc + opt.output_nc, opt.ndf, opt.netD,
