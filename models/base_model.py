@@ -35,7 +35,8 @@ class BaseModel(ABC):
         self.opt = opt
         self.gpu_ids = opt.gpu_ids
         self.isTrain = opt.isTrain
-        self.device = torch.device('cuda:{}'.format(self.gpu_ids[0])) if self.gpu_ids else torch.device('cpu')  # get device name: CPU or GPU
+        self.device = torch.device('cuda:{}'.format(self.gpu_ids[0])) if self.gpu_ids else torch.device(
+            'cpu')  # get device name: CPU or GPU
         self.save_dir = os.path.join(opt.checkpoints_dir, opt.name)  # save all the checkpoints to save_dir
         if opt.preprocess != 'scale_width':  # with [scale_width], input images might have different sizes, which hurts the performance of cudnn.benchmark.
             torch.backends.cudnn.benchmark = True
@@ -141,7 +142,8 @@ class BaseModel(ABC):
         errors_ret = OrderedDict()
         for name in self.loss_names:
             if isinstance(name, str):
-                errors_ret[name] = float(getattr(self, 'loss_' + name))  # float(...) works for both scalar tensor and float number
+                errors_ret[name] = float(
+                    getattr(self, 'loss_' + name))  # float(...) works for both scalar tensor and float number
         return errors_ret
 
     def save_networks(self, epoch):
@@ -157,7 +159,7 @@ class BaseModel(ABC):
                 net = getattr(self, 'net' + name)
 
                 if len(self.gpu_ids) > 0 and torch.cuda.is_available():
-                    torch.save(net.module.cpu().state_dict(), save_path)
+                    torch.save(net.cpu().state_dict(), save_path)
                     net.cuda(self.gpu_ids[0])
                 else:
                     torch.save(net.cpu().state_dict(), save_path)
@@ -171,7 +173,7 @@ class BaseModel(ABC):
                 if getattr(module, key) is None:
                     state_dict.pop('.'.join(keys))
             if module.__class__.__name__.startswith('InstanceNorm') and \
-               (key == 'num_batches_tracked'):
+                    (key == 'num_batches_tracked'):
                 state_dict.pop('.'.join(keys))
         else:
             self.__patch_instance_norm_state_dict(state_dict, getattr(module, key), keys, i + 1)
@@ -243,10 +245,13 @@ class BaseModel(ABC):
                 break
             visuals = self.get_current_visuals()  # get image results
             img_path = self.get_image_paths()  # get image paths
+            real_A = visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy() * [0.5, 0.5, 0.5] + [0.5, 0.5, 0.5]
+            fake_B = visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy() * [0.5, 0.5, 0.5] + [0.5, 0.5, 0.5]
+            real_B = visuals['real_B'].cpu()[0].permute(1, 2, 0).numpy() * [0.5, 0.5, 0.5] + [0.5, 0.5, 0.5]
+
+            threshold_fake_B = fake_B * real_A
             frame_data.append([img_path[0],
-                               np.hstack([visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy(),
-                                          visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy(),
-                                          visuals['real_B'].cpu()[0].permute(1, 2, 0).numpy()])
+                               np.hstack([real_A, fake_B, threshold_fake_B, real_B]),
                                ])
 
         frame_data = np.array([x[1] for x in frame_data])
