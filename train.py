@@ -50,8 +50,8 @@ if __name__ == '__main__':
     test_opt.dataroot = opt.dataroot
     test_opt.dataset_mode = opt.dataset_mode
     test_dataset = create_dataset(test_opt)
-    visualizer.display_video_results(model.get_video(test_dataset), None, None)
-    model.save_networks('latest')
+    # visualizer.display_video_results(model.get_video(test_dataset), None, None)
+    # model.save_networks('latest')
 
     for epoch in range(opt.epoch_count, opt.n_epochs + opt.n_epochs_decay + 1):    # outer loop for different epochs; we save the model by <epoch_count>, <epoch_count>+<save_latest_freq>
         epoch_start_time = time.time()  # timer for entire epoch
