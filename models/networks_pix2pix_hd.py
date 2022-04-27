@@ -238,6 +238,7 @@ class LocalEnhancer(nn.Module):
             model_upsample = getattr(self, 'model' + str(n_local_enhancers) + '_2')
             input_i = input_downsampled[self.n_local_enhancers - n_local_enhancers]
             output_prev = model_upsample(model_downsample(input_i) + output_prev)
+        output_prev = torch.sigmoid(output_prev)
         return output_prev
 
 
@@ -270,7 +271,9 @@ class GlobalGenerator(nn.Module):
         self.model = nn.Sequential(*model)
 
     def forward(self, input):
-        return self.model(input)
+        output = self.model(input)
+        output = torch.sigmoid(output)
+        return output
 
     # Define a resnet block
 

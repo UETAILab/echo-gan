@@ -243,10 +243,13 @@ class BaseModel(ABC):
                 break
             visuals = self.get_current_visuals()  # get image results
             img_path = self.get_image_paths()  # get image paths
+            real_A = visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy()
+            fake_B = visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy()
+            real_B = visuals['real_B'].cpu()[0].permute(1, 2, 0).numpy()
+
+            threshold_fake_B = fake_B * real_A
             frame_data.append([img_path[0],
-                               np.hstack([visuals['fake_B'].cpu()[0].permute(1, 2, 0).numpy(),
-                                          visuals['real_A'].cpu()[0].permute(1, 2, 0).numpy(),
-                                          visuals['real_B'].cpu()[0].permute(1, 2, 0).numpy()])
+                               np.hstack([real_A, fake_B, threshold_fake_B, real_B]),
                                ])
 
         frame_data = np.array([x[1] for x in frame_data])
