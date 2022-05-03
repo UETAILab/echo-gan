@@ -1,6 +1,9 @@
 import torch
 import numpy as np
 import itertools
+
+from torch import nn
+
 from util.image_pool import ImagePool
 from util.util import get_frame_index
 from .base_model import BaseModel
@@ -177,8 +180,12 @@ class CycleGANHDModel(BaseModel):
         self.loss_cycle_A = self.criterionCycle(self.rec_A, self.real_A) * lambda_A
         # Backward cycle loss || G_A(G_B(B)) - B||
         self.loss_cycle_B = self.criterionCycle(self.rec_B, self.real_B) * lambda_B
+
+        self.loss_A = 0.001 * nn.MSELoss()(self.fake_B, self.real_A)
+        self.loss_B = 0.001 * nn.MSELoss()(self.fake_A, self.real_B)
+
         # combined loss and calculate gradients
-        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B
+        self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_idt_A + self.loss_idt_B + self.loss_A + self.loss_B
         self.loss_G.backward()
 
     def optimize_parameters(self):
